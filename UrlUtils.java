@@ -1,6 +1,3 @@
-import java.net.URI;
-import java.net.URISyntaxException;
-
 public final class UrlUtils {
 
 	private UrlUtils() {
