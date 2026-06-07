@@ -1,3 +1,5 @@
+import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.URI;
 
 public class UrlUtils {
@@ -67,4 +69,41 @@ public class UrlUtils {
 
         return false;
 	}
+
+    /**
+     * 智能补全 URL 协议。
+     *
+     * 调用方已保证 url 能通过 isUrl(url)，因此这里专注处理协议补全：
+     * 1. 已经带 HTTP/HTTPS 协议的 URL 不做改写；
+     * 2. 裸域名优先尝试 HTTPS；
+     * 3. HTTPS 无法连通时回退到 HTTP。
+     */
+    public static String smartCompleteUrl(String url) {
+        // 已显式带协议时直接返回，避免改变调用方传入的大小写、路径、查询参数或锚点。
+        if (url.regionMatches(true, 0, "http://", 0, "http://".length())
+                || url.regionMatches(true, 0, "https://", 0, "https://".length())) {
+            return url;
+        }
+
+        // 裸域名默认优先使用 HTTPS；只有 HTTPS 无法拿到响应时才降级为 HTTP。
+        String httpsUrl = "https://" + url;
+        try {
+            HttpURLConnection connection = (HttpURLConnection) URI.create(httpsUrl).toURL().openConnection();
+            // 只验证连通性，不读取响应体，减少对目标服务的请求成本。
+            connection.setRequestMethod("HEAD");
+            // 避免目标站点不可达时长时间阻塞调用方。
+            connection.setConnectTimeout(3000);
+            connection.setReadTimeout(3000);
+            // 允许常见的 HTTPS 跳转链路，例如从根域跳转到 www 子域。
+            connection.setInstanceFollowRedirects(true);
+            // 只要能拿到合法 HTTP 状态码就认为 HTTPS 可连通，403/404 也不降级。
+            if (connection.getResponseCode() > 0) {
+                return httpsUrl;
+            }
+        } catch (IOException e) {
+            // HTTPS 不可连通时回退到 HTTP。
+        }
+
+        return "http://" + url;
+    }
 }

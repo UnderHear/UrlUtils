@@ -1,4 +1,8 @@
 void main() {
+    // ====================
+    // isUrl examples.
+    // ====================
+
     // Normal domains.
     IO.println(UrlUtils.isUrl("example.com"));                    // true
     IO.println(UrlUtils.isUrl("www.example.com"));                // true
@@ -61,4 +65,26 @@ void main() {
     IO.println(UrlUtils.isUrl("1.2.3.4.5"));                      // false
     IO.println(UrlUtils.isUrl("256.256.256.256"));                // false
     IO.println(UrlUtils.isUrl("999.999.999.999"));                // false
+
+    // ===============================
+    // smartCompleteUrl examples.
+    // ===============================
+
+    // Already has a protocol.
+    IO.println(UrlUtils.smartCompleteUrl("https://example.com"));                 // https://example.com
+    IO.println(UrlUtils.smartCompleteUrl("http://example.com"));                  // http://example.com
+    IO.println(UrlUtils.smartCompleteUrl("HTTPS://EXAMPLE.COM"));                 // HTTPS://EXAMPLE.COM
+    IO.println(UrlUtils.smartCompleteUrl("https://example.com/path/to/page"));    // https://example.com/path/to/page
+    IO.println(UrlUtils.smartCompleteUrl("https://example.com/search?q=java"));   // https://example.com/search?q=java
+    IO.println(UrlUtils.smartCompleteUrl("https://example.com/index.html#top"));  // https://example.com/index.html#top
+
+    // No protocol, HTTPS is reachable.
+    IO.println(UrlUtils.smartCompleteUrl("example.com"));                         // https://example.com
+    IO.println(UrlUtils.smartCompleteUrl("www.example.com"));                     // https://www.example.com
+    IO.println(UrlUtils.smartCompleteUrl("example.com/path/to/page"));            // https://example.com/path/to/page
+    IO.println(UrlUtils.smartCompleteUrl("example.com/search?q=java"));           // https://example.com/search?q=java
+    IO.println(UrlUtils.smartCompleteUrl("example.com/index.html#top"));          // https://example.com/index.html#top
+
+    // No protocol, HTTPS is not reachable.
+    IO.println(UrlUtils.smartCompleteUrl("example.invalid"));                     // http://example.invalid
 }
