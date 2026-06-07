@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.util.Locale;
 
 public class UrlUtils {
 
@@ -105,5 +106,23 @@ public class UrlUtils {
         }
 
         return "http://" + url;
+    }
+
+    /**
+     * 规范化 URL：调用方已确保 URL 通过 isUrl(url)，且已经过 smartCompleteUrl(url) 补全。
+     * 这里只把协议和域名转成小写，路径、查询参数和锚点保持原样。
+     */
+    public static String normalizeUrl(String url) {
+        URI uri = URI.create(url);
+        String host = uri.getHost();
+        String authority = uri.getRawAuthority();
+
+        return uri.getScheme().toLowerCase(Locale.ROOT)
+                + "://"
+                + host.toLowerCase(Locale.ROOT)
+                + authority.substring(host.length())
+                + (uri.getRawPath() == null ? "" : uri.getRawPath())
+                + (uri.getRawQuery() == null ? "" : "?" + uri.getRawQuery())
+                + (uri.getRawFragment() == null ? "" : "#" + uri.getRawFragment());
     }
 }

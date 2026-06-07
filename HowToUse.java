@@ -87,4 +87,27 @@ void main() {
 
     // No protocol, HTTPS is not reachable.
     IO.println(UrlUtils.smartCompleteUrl("example.invalid"));                     // http://example.invalid
+
+    // =========================
+    // normalizeUrl examples.Just convert mixed-case text to lowercase, as protocols and domain names are case-insensitive and lowercase is the default.
+    // =========================
+
+    // Lowercase protocol and host.
+    IO.println(UrlUtils.normalizeUrl("HTTPS://EXAMPLE.COM"));                     // https://example.com
+    IO.println(UrlUtils.normalizeUrl("HTTP://GitHub.COM"));                       // http://github.com
+    IO.println(UrlUtils.normalizeUrl("HTTPS://GitHub.COM/user/About?id=123"));    // https://github.com/user/About?id=123
+
+    // Keep path, query, and fragment unchanged.
+    IO.println(UrlUtils.normalizeUrl("HTTPS://GitHub.COM/User/About"));           // https://github.com/User/About
+    IO.println(UrlUtils.normalizeUrl("HTTPS://GitHub.COM/search?Keyword=Java"));  // https://github.com/search?Keyword=Java
+    IO.println(UrlUtils.normalizeUrl("HTTPS://GitHub.COM/index.html#Top"));       // https://github.com/index.html#Top
+
+    // Keep port and percent encoding unchanged.
+    IO.println(UrlUtils.normalizeUrl("HTTPS://GitHub.COM:8080/user/About"));      // https://github.com:8080/user/About
+    IO.println(UrlUtils.normalizeUrl("HTTPS://GitHub.COM:080/user/About%2FName"));// https://github.com:080/user/About%2FName
+    IO.println(UrlUtils.normalizeUrl("HTTPS://GitHub.COM/search?q=a%2Fb#Top"));   // https://github.com/search?q=a%2Fb#Top
+
+    // IPv4 addresses and already normalized URLs.
+    IO.println(UrlUtils.normalizeUrl("HTTP://115.190.254.60:8080/User/About"));   // http://115.190.254.60:8080/User/About
+    IO.println(UrlUtils.normalizeUrl("https://example.com/path/to/page"));        // https://example.com/path/to/page
 }
